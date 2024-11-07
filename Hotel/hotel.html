@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Reserva</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: auto;
+        }
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 500px;
+        }
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-container .required::after {
+            content: ' *';
+            color: red;
+        }
+        .form-container input, .form-container select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #45a049;
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Formulário de Reserva</h2>
+
+    <?php if (isset($_GET['erro'])): ?>
+        <div class="error-message">
+            <?php echo $_GET['erro']; ?>
+        </div>
+    <?php endif; ?>
+
+    <form method="POST" action="processar_reserva.php" id="reservaForm">
+        <div>
+            <label for="nome" class="required">Nome</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+        <div>
+            <label for="sexo">Sexo</label>
+            <select id="sexo" name="sexo">
+                <option value="">Selecione</option>
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+                <option value="outro">Outro</option>
+            </select>
+        </div>
+        <div>
+            <label for="email" class="required">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="dataHora" class="required">Data e Hora da Entrada</label>
+            <input type="datetime-local" id="dataHora" name="dataHora" required>
+        </div>
+        <div>
+            <label for="numNoites" class="required">Número de Noites</label>
+            <input type="number" id="numNoites" name="numNoites" required oninput="calcularTotalDiaria()">
+        </div>
+        <div>
+            <label for="numHospedes" class="required">Número de Hóspedes</label>
+            <input type="number" id="numHospedes" name="numHospedes" required>
+        </div>
+        <div>
+            <label for="valorTotal" class="required">Valor Total (em R$)</label>
+            <input type="number" id="valorTotal" name="valorTotal" required readonly>
+        </div>
+        <div>
+            <label for="newslatter">Receba Nosso Newslatter</label>
+            <input type="email" id="newslatter" name="newslatter">
+        </div>
+        <button type="button" onclick="confirmarReserva()">Confirmar Reserva</button>
+        <br>
+        <br>
+        <button type="reset" value="Limpar">Limpar</button>
+        <br>
+        <br>
+        <button type="button" onclick="window.location.href='index.html'">Voltar Para Página Inicial</button>
+    </form>
+</div>
+
+<script>
+    // Função para calcular o valor total com base no número de noites
+    function calcularTotalDiaria() {
+        const numNoites = document.getElementById('numNoites').value;
+        const valorTotal = document.getElementById('valorTotal');
+        
+        // Verifica se o número de noites é válido
+        if (numNoites > 0) {
+            const total = numNoites * 150;  // Preço de 150 reais por noite
+            valorTotal.value = total.toFixed(2);  // Atualiza o campo com o total calculado
+        } else {
+            valorTotal.value = '';  // Limpa o campo se o número de noites for inválido
+        }
+    }
+
+    // Função para confirmar a reserva
+    function confirmarReserva() {
+        const nome = document.getElementById('nome').value;
+        const sexo = document.getElementById('sexo').value;
+        const email = document.getElementById('email').value;
+        const dataHora = document.getElementById('dataHora').value;
+        const numNoites = document.getElementById('numNoites').value;
+        const numHospedes = document.getElementById('numHospedes').value;
+        const valorTotal = document.getElementById('valorTotal').value;
+
+        // Valida os campos obrigatórios
+        if (!nome || !email || !dataHora || !numNoites || !numHospedes || !valorTotal) {
+            alert('Por favor, preencha todos os campos obrigatórios!');
+            return;  // Interrompe o processo de confirmação
+        }
+
+        const mensagem = `Confirma a reserva para:\n\nNome: ${nome}\nEmail: ${email}\nData e Hora de Entrada: ${dataHora}\nNúmero de Noites: ${numNoites}\nNúmero de Hóspedes: ${numHospedes}\nValor Total: R$${valorTotal}`;
+
+        const confirmar = confirm(mensagem);
+        
+        if (confirmar) {
+            // Se confirmado, envia o formulário
+            document.getElementById('reservaForm').submit();
+        }
+    }
+</script>
+
+</body>
+</html>
